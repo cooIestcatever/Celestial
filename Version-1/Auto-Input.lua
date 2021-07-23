@@ -531,13 +531,11 @@ function getTarget()
 	return Target
 end
 
-local mt = getrawmetatable(game)
-setreadonly(mt, false)
-local index = mt.__index
-local namecall = mt.__namecall
+local index
+local namecall
 local hookfunc
 
-mt.__namecall = newcclosure(function(...)
+namecall = hookmetamethod(game, "__namecall", function(...)
     local method = getnamecallmethod()
     local args = {...}
     for _, rayMethod in next, getgenv().methodsTable do
@@ -549,7 +547,7 @@ mt.__namecall = newcclosure(function(...)
     return namecall(unpack(args))
 end)
 
-mt.__index = newcclosure(function(func, idx)
+index = hookmetamethod(game, "__index", function(func, idx)
     if func == Mouse and tostring(idx) == "Hit" and Hit then
         return Hit.CFrame
     end
